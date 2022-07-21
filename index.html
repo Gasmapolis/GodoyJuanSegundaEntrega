@@ -85,7 +85,7 @@
 
 
     <!-- Modal CARRITO -->
-    <div class="modal fade" id="carrito" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade container" id="carrito" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -98,14 +98,17 @@
                             <tr>
                                 <th scope="col">Producto</th>
                                 <th scope="col">Precio unidad</th>
+                                <th scope="col"></th>
                                 <th scope="col">cantidad</th>
+                                <th scope="col"></th>
+                                <th scope="col">TOTAL</th>
                             </tr>
                         </thead>
                         <tbody id="carrito-contenedor" class="table-group-divider">
                 </div>
                 <div class="modal-content">
                     <h5 class="modal-title" id="precioTotal"></h5>
-                    <button onclick="limpiarCarrito()" type="button" id="vaciar-carrito" class="btn btn-primary">VACIAR
+                    <button type="button" id="vaciar-carrito" class="btn btn-primary">VACIAR
                         CARRITO</button>
                 </div>
                 <div class="modal-footer">

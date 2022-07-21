@@ -38,10 +38,8 @@ catalogo.push(producto2);
 catalogo.push(producto3);
 catalogo.push(producto4);
 catalogo.push(producto5);
-
-
-
 console.log(listaProductos)
+
 function empujando(){
     listaProductos.push(producto1);
     listaProductos.push(producto2);
@@ -50,8 +48,6 @@ function empujando(){
     listaProductos.push(producto5);
 }
 
-const contenedorProductos = document.getElementById("catalogo");
-const botonVaciar = document.getElementById("vaciar-carrito");
 
 const cardsDiv = document.querySelector("#catalogo");
 catalogo.forEach((producto) => {
@@ -86,13 +82,18 @@ arrayDeBotones.forEach((boton) => {
         total();
     });
 });
-
+// BOTON VACIAR CARRITO DENTRO DEL MODAL //
+const botonVaciar = document.getElementById("vaciar-carrito");
 botonVaciar.addEventListener("click", () => {
+    listaProductos.forEach((producto) => {
+        producto.cantidad = 0
+    })
     carrito.producto.length = 0;
     limpiarCarrito();
     total();
     renovarStorage();
 });
+
 function totales(){
     let totalTotal = 0 
     carrito.producto.forEach((producto)=> {
@@ -110,24 +111,52 @@ function actualizarCarrito(carrito) {
         divCarrito.innerHTML += `
         <td>${producto.nombre}</td>
         <td>$${producto.precio}</td>
-        <td>${producto.cantidad}</td>        
+        <td><button class="botonSumar btn btn-success"><i id="${producto.id}" class="fa-solid fa-plus"></i></button></td>
+        <td class="text-center"><span>${producto.cantidad}</span></td>        
+        <td><button  class="botonRestar btn btn-danger"><i id="${producto.id}" class="fa-solid fa-minus"></i></button></td>
         <td>${totalProducto(producto.precio,producto.cantidad)}</td>        
         <td class=""><button  class="botonBorrar btn btn-danger"><i id="${producto.id}" class="fa-regular fa-trash-can"></i></button></td>`;
     });
+    const botonSumar = document.querySelectorAll(".botonSumar");
+    const arrayDeBotonSumar = Array.from(botonSumar);
+    arrayDeBotonSumar.find((boton) => {
+        boton.addEventListener("click", (e) => {
+            const item = carrito.producto.find((producto) => producto.id == e.target.id);
+            const revisarCarrito = carrito.producto.some((producto) => producto.id == e.target.id)
+
+            revisarCarrito ? sumar(item) && actualizarCarrito(carrito) : eliminar(item)
+
+            limpiarCarrito();
+            actualizarCarrito(carrito);
+            total();
+        })   
+    })
+
     const botonBorrar = document.querySelectorAll(".botonBorrar");
     const arrayDeBotonBorrar = Array.from(botonBorrar);
     arrayDeBotonBorrar.find((boton) => {
         boton.addEventListener("click", (e) => {
             const item = carrito.producto.find((producto) => producto.id == e.target.id);
-            const sacarCarrito = carrito.producto.find((producto) => producto.id == e.target.id)
-            const revisarCarrito = carrito.producto.some((producto) => producto.id == e.target.id)
+            item.cantidad = 0
+            eliminar(item)
+            limpiarCarrito()
+            actualizarCarrito(carrito)
+            total()
+        })
+    })
 
-            revisarCarrito ? restar(sacarCarrito) && actualizarCarrito(carrito) : carrito.producto.push(productoSeleccionado) && sumar(productoSeleccionado)
+    const botonRestar = document.querySelectorAll(".botonRestar");
+    const arrayDeBotonRestar = Array.from(botonRestar);
+    arrayDeBotonRestar.find((boton) => {
+        boton.addEventListener("click", (e) => {
+            const item = carrito.producto.find((producto) => producto.id == e.target.id);
+            const revisarCarrito = carrito.producto.some((producto) => producto.id == e.target.id)
+            revisarCarrito ? restar(item) && actualizarCarrito(carrito) : eliminar(item)
+            item.cantidad == 0 ? eliminar(item) : console.log(carrito)
 
 
             console.log(item);
-            const indice = carrito.producto.indexOf(item);
-            carrito.producto.splice(indice, 1);
+
             limpiarCarrito();
             actualizarCarrito(carrito);
             total();
@@ -136,6 +165,10 @@ function actualizarCarrito(carrito) {
     renovarStorage()
 }
 
+function eliminar(item){
+    const indice = carrito.producto.indexOf(item);
+    carrito.producto.splice(indice, 1);
+}
 function sumar(item){
     item.cantidad += 1
     return
@@ -154,7 +187,6 @@ function limpiarCarrito() {
     divCarrito.innerHTML = "";
     renovarStorage();
 }
-
 
 function total() {
     const precioTotal = document.getElementById(`precioTotal`);
