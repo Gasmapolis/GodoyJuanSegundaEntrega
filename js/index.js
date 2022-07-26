@@ -52,7 +52,7 @@ function empujando(){
 const cardsDiv = document.querySelector("#catalogo");
 catalogo.forEach((producto) => {
     cardsDiv.innerHTML += `    
-    <div class="card m-4 col-6 col-md-3 col-sm-4 p-4" style="width:13rem;">
+    <div class=" tarjeta card m-4 col-6 col-md-3 col-sm-4 p-4" style="width:13rem;">
         <img src="./images/${producto.foto}" class="card-img-top" alt="...">
         <div class="card-body text-center">
             <h5 class="card-title">${producto.nombre}</h5>
@@ -75,6 +75,13 @@ arrayDeBotones.forEach((boton) => {
         );
         const enCarrito = carrito.producto.find((producto) => producto.id == e.target.id)
         const revisarCarrito = carrito.producto.some((producto) => producto.id == e.target.id)
+        Toastify({
+            
+            text: `${productoSeleccionado.nombre} a sido agregado al carrito`,
+            
+            duration: 1500
+            
+            }).showToast();
 
         revisarCarrito ? sumar(enCarrito) && actualizarCarrito(carrito) : carrito.producto.push(productoSeleccionado) && sumar(productoSeleccionado)
         limpiarCarrito();
@@ -85,14 +92,33 @@ arrayDeBotones.forEach((boton) => {
 // BOTON VACIAR CARRITO DENTRO DEL MODAL //
 const botonVaciar = document.getElementById("vaciar-carrito");
 botonVaciar.addEventListener("click", () => {
+    Swal.fire({
+        icon: 'warning',
+        title: 'ESTAS SEGURO DE VACIAR CARRITO?',
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: 'VACIAR',
+        denyButtonText: `NO GRACIAS`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+            vaciarCarrito()
+            limpiarCarrito();
+            total();
+            renovarStorage();
+          Swal.fire('CARRITO VACIO', '', 'success')
+        } else if (result.isDenied) {
+          Swal.fire('TE SALVASTE WEY', '', 'info')
+        }
+      })
+
+});
+
+function vaciarCarrito(){
     listaProductos.forEach((producto) => {
         producto.cantidad = 0
     })
     carrito.producto.length = 0;
-    limpiarCarrito();
-    total();
-    renovarStorage();
-});
+}
 
 function totales(){
     let totalTotal = 0 
@@ -111,11 +137,11 @@ function actualizarCarrito(carrito) {
         divCarrito.innerHTML += `
         <td>${producto.nombre}</td>
         <td>$${producto.precio}</td>
-        <td><button class="botonSumar btn btn-success"><i id="${producto.id}" class="fa-solid fa-plus"></i></button></td>
+        <td><button id="${producto.id}" class="botonSumar btn btn-success"><i id="${producto.id}" class="fa-solid fa-plus"></i></button></td>
         <td class="text-center"><span>${producto.cantidad}</span></td>        
-        <td><button  class="botonRestar btn btn-danger"><i id="${producto.id}" class="fa-solid fa-minus"></i></button></td>
+        <td><button id="${producto.id}" class="botonRestar btn btn-danger"><i id="${producto.id}" class="fa-solid fa-minus"></i></button></td>
         <td>${totalProducto(producto.precio,producto.cantidad)}</td>        
-        <td class=""><button  class="botonBorrar btn btn-danger"><i id="${producto.id}" class="fa-regular fa-trash-can"></i></button></td>`;
+        <td class=""><button id="${producto.id}" class="botonBorrar btn btn-danger"><i  id="${producto.id}" class="fa-regular fa-trash-can"></i></button></td>`;
     });
     const botonSumar = document.querySelectorAll(".botonSumar");
     const arrayDeBotonSumar = Array.from(botonSumar);
@@ -124,7 +150,7 @@ function actualizarCarrito(carrito) {
             const item = carrito.producto.find((producto) => producto.id == e.target.id);
             const revisarCarrito = carrito.producto.some((producto) => producto.id == e.target.id)
 
-            revisarCarrito ? sumar(item) && actualizarCarrito(carrito) : eliminar(item)
+            revisarCarrito ? sumar(item) && actualizarCarrito(carrito) : console.log(item)
 
             limpiarCarrito();
             actualizarCarrito(carrito);
@@ -224,4 +250,3 @@ window.addEventListener("DOMContentLoaded", (e) => {
     total();
     
 });
-
